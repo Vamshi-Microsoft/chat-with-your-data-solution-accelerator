@@ -84,6 +84,8 @@ const Chat = () => {
   const [fetchingConvMessages, setFetchingConvMessages] = React.useState(false);
   const [isSavingToDB, setIsSavingToDB] = React.useState(false);
   const [isInitialAPItriggered, setIsInitialAPItriggered] = useState(false);
+  const [Count, SetCount] = useState(1);
+
 
   const saveToDB = async (messages: ChatMessage[], convId: string) => {
     if (!convId || !messages.length) {
