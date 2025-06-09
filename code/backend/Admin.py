@@ -21,7 +21,7 @@ if os.getenv("APPLICATIONINSIGHTS_ENABLED", "false").lower() == "true":
     configure_azure_monitor()
 
 logger = logging.getLogger(__name__)
-logger.debug("Starting admin app")
+logger.debug("Starting admin application")
 
 
 st.set_page_config(
