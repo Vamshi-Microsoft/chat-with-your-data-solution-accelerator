@@ -68,7 +68,7 @@ By default, this repo comes with one specific set of RAG configurations includin
 
 The accelerator presented here provides several options, for example:
 * The ability to ground a model using both data and public web pages
-* A backend with support for 'custom' and 'On Your Data' [conversation flows](./docs/conversation_flow_options_test.md)
+* A backend with support for 'custom' and 'On Your Data' [conversation flows](./docs/conversation_flow_options.md)
 * Advanced prompt engineering capabilities
 * An admin site for ingesting/inspecting/configuring your dataset on the fly
 * Push or Pull model for data ingestion:  See [integrated vectorization](./docs/integrated_vectorization.md) documentation for more details
@@ -182,7 +182,7 @@ To review Cosmos DB configuration overview and steps, follow the link [here](doc
 ![Solution Architecture - Chat with your data CosmosDB](/docs/images/architecture_cdb.png)
 
 ### Deploy instructions
-The "Deploy to Azure" button offers a one-click deployment where you don’t have to clone the code. If you would like a developer experience instead, follow the [local deployment instructions](./docs/LOCAL_DEPLOYMENT.md).
+The "Deploy to Azure" button offers a one-click deployment where you don’t have to clone the code. If you would like a developer experience instead, follow the [local deployment instructions](./docs/LOCAL_DEPLOYMENT_test.md).
 
 Once you deploy to Azure, you will have the option to select PostgreSQL or Cosmos DB, see screenshot below.
 
