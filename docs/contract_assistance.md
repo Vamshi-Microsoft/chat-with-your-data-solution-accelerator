@@ -58,5 +58,3 @@ We have added sample contract data in the [Contract Assistant sample Docs](../da
 
 ## Conclusion
 This README provides an overview of the Chat With Your Data Contract Review and Summarization Assistant prompt, instructions for updating the prompt configuration, and examples of questions and answers. Ensure you follow the guidelines for updating the prompt to maintain consistency and accuracy in responses.
-
-Test
