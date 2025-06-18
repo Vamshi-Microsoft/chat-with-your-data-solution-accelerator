@@ -204,6 +204,7 @@ const Layout = ({ children,toggleSpinner, ...props }: LayoutProps) => {
           >
             <CopyRegular className={styles.copyButton} />
             <span className={styles.copyButtonText}>{copyText}</span>
+            <span className={styles.copyButtonText}>{copyText}</span>
           </div>
         </Stack>
       </Dialog>
