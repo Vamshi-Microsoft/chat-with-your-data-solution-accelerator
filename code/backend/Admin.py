@@ -22,7 +22,6 @@ if os.getenv("APPLICATIONINSIGHTS_ENABLED", "false").lower() == "true":
 
 logger = logging.getLogger(__name__)
 logger.debug("Starting admin app")
-logger.debug("Starting admin app")
 
 
 st.set_page_config(
