@@ -55,7 +55,7 @@ Before you begin, ensure you have the following information:
    - Set the **Full Image name** to the relevant image name and tag:
      - For Web App: `rag-webapp:latest`
 
-   ![Deployment Center](images/deployment_center.png)
+   ![Deployment Center](images/deployment_center_test2.png)
 
 5. **Save Changes**:
    - Click **Save** to save the configuration.

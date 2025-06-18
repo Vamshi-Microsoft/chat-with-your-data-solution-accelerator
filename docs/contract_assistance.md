@@ -34,7 +34,7 @@ In the admin panel, there is a dropdown to select the Chat With Your Data Contra
 
 - **Default**: Chat With Your Data default prompt.
 
-![UnSelected](images/cwyd_admin_contract_unselected.png)
+![UnSelected](images/cwyd_admin_contract_unselected_test.png)
 
 - **Selected**: Contract Review and Summarization Assistant prompt.
 

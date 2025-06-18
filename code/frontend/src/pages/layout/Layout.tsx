@@ -26,6 +26,8 @@ const Layout = ({ children,toggleSpinner, ...props }: LayoutProps) => {
   const [isSharePanelOpen, setIsSharePanelOpen] = useState<boolean>(false);
   const [copyClicked, setCopyClicked] = useState<boolean>(false);
   const [copyText, setCopyText] = useState<string>("Copy URL");
+  const [count, setCount] = useState<boolean>(false);
+
 
   const handleShareClick = () => {
     setIsSharePanelOpen(true);
