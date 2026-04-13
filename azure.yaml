@@ -69,8 +69,8 @@ services:
           interactive: true
           continueOnError: false
         posix:
-          shell: sh
-          run: sh ./scripts/package_frontend.sh
+          shell: bash
+          run: bash ./scripts/package_frontend.sh
           interactive: true
           continueOnError: false
 
