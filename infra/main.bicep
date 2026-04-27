@@ -1614,9 +1614,15 @@ module contentsafety 'modules/core/ai/cognitiveservices.bicep' = {
   dependsOn: enablePrivateNetworking ? avmPrivateDnsZones : []
 }
 
-// If advanced image processing is used, storage account already should be publicly accessible.
-// Computer Vision requires files to be publicly accessible as per the official docsumentation: https://learn.microsoft.com/en-us/azure/ai-services/computer-vision/how-to/blob-storage-search
-var enablePrivateEndpointsStorage = enablePrivateNetworking && !useAdvancedImageProcessing
+// Always create storage private endpoints when private networking is enabled.
+// Previously this was disabled when useAdvancedImageProcessing=true so that Computer Vision could
+// read blobs over the public internet (per https://learn.microsoft.com/en-us/azure/ai-services/computer-vision/how-to/blob-storage-search).
+// However, the WAF post-deploy hardening step (.github/workflows/import-sample-data-cosmosdb.yml)
+// unconditionally sets publicNetworkAccess=Disabled and defaultAction=Deny after the import. With no
+// private endpoint, apps then cannot reach storage and Ingest/Delete/Configuration pages fail with
+// AuthorizationFailure. Computer Vision continues to work via the `AzureServices` networkAcls bypass
+// configured below (Computer Vision is a trusted Microsoft service).
+var enablePrivateEndpointsStorage = enablePrivateNetworking
 module storage './modules/storage/storage-account/storage-account.bicep' = {
   name: take('avm.res.storage.storage-account.${storageAccountName}', 64)
   params: {
