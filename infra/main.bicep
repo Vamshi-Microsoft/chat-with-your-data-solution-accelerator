@@ -1227,6 +1227,10 @@ module web 'modules/app/web.bicep' = {
     publicNetworkAccess: 'Enabled' // Always enabling public network access
     applicationInsightsName: enableMonitoring ? monitoring!.outputs.applicationInsightsName : ''
     appSettings: union(
+      enablePrivateNetworking ? {
+        WEBSITE_DNS_SERVER: '168.63.129.16'
+        WEBSITE_DNS_ALT_SERVER: '168.63.129.16'
+      } : {},
       {
         AZURE_BLOB_ACCOUNT_NAME: storageAccountName
         AZURE_BLOB_CONTAINER_NAME: blobContainerName
@@ -1329,6 +1333,10 @@ module adminweb 'modules/app/adminweb.bicep' = {
     userAssignedIdentityResourceId: managedIdentityModule.outputs.resourceId
     // App settings
     appSettings: union(
+      enablePrivateNetworking ? {
+        WEBSITE_DNS_SERVER: '168.63.129.16'
+        WEBSITE_DNS_ALT_SERVER: '168.63.129.16'
+      } : {},
       {
         AZURE_BLOB_ACCOUNT_NAME: storageAccountName
         AZURE_BLOB_CONTAINER_NAME: blobContainerName
@@ -1435,6 +1443,10 @@ module function 'modules/app/function.bicep' = {
     vnetImagePullEnabled: enablePrivateNetworking ? true : false
     publicNetworkAccess: 'Enabled' // Always enabling public network access
     appSettings: union(
+      enablePrivateNetworking ? {
+        WEBSITE_DNS_SERVER: '168.63.129.16'
+        WEBSITE_DNS_ALT_SERVER: '168.63.129.16'
+      } : {},
       {
         AZURE_BLOB_ACCOUNT_NAME: storageAccountName
         AZURE_BLOB_CONTAINER_NAME: blobContainerName
