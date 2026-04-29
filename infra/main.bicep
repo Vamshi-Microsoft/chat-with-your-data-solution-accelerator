@@ -1224,6 +1224,11 @@ module web 'modules/app/web.bicep' = {
     vnetRouteAllEnabled: enablePrivateNetworking ? true : false
     vnetImagePullEnabled: enablePrivateNetworking ? true : false
     virtualNetworkSubnetId: enablePrivateNetworking ? virtualNetwork!.outputs.webSubnetResourceId : ''
+    dnsConfiguration: enablePrivateNetworking ? {
+      dnsServers: [
+        '168.63.129.16'
+      ]
+    } : null
     publicNetworkAccess: 'Enabled' // Always enabling public network access
     applicationInsightsName: enableMonitoring ? monitoring!.outputs.applicationInsightsName : ''
     appSettings: union(
@@ -1411,6 +1416,11 @@ module adminweb 'modules/app/adminweb.bicep' = {
     vnetImagePullEnabled: enablePrivateNetworking ? true : false
     vnetRouteAllEnabled: enablePrivateNetworking ? true : false
     virtualNetworkSubnetId: enablePrivateNetworking ? virtualNetwork!.outputs.webSubnetResourceId : ''
+    dnsConfiguration: enablePrivateNetworking ? {
+      dnsServers: [
+        '168.63.129.16'
+      ]
+    } : null
     publicNetworkAccess: 'Enabled' // Always enabling public network access
   }
 }
@@ -1435,6 +1445,11 @@ module function 'modules/app/function.bicep' = {
     virtualNetworkSubnetId: enablePrivateNetworking ? virtualNetwork!.outputs.webSubnetResourceId : ''
     vnetRouteAllEnabled: enablePrivateNetworking ? true : false
     vnetImagePullEnabled: enablePrivateNetworking ? true : false
+    dnsConfiguration: enablePrivateNetworking ? {
+      dnsServers: [
+        '168.63.129.16'
+      ]
+    } : null
     publicNetworkAccess: 'Enabled' // Always enabling public network access
     appSettings: union(
       {

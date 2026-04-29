@@ -73,6 +73,9 @@ param diagnosticSettings array = []
 ])
 param publicNetworkAccess string?
 
+@description('Optional. Property to configure various DNS related settings for a site.')
+param dnsConfiguration resourceInput<'Microsoft.Web/sites@2024-04-01'>.properties.dnsConfiguration?
+
 var useDocker = !empty(dockerFullImageName)
 var kind = useDocker ? 'functionapp,linux,container' : 'functionapp,linux'
 
@@ -99,6 +102,7 @@ module function '../core/host/functions.bicep' = {
     vnetContentShareEnabled: vnetContentShareEnabled
     vnetImagePullEnabled: vnetImagePullEnabled
     vnetRouteAllEnabled: vnetRouteAllEnabled
+    dnsConfiguration: dnsConfiguration
     privateEndpoints: privateEndpoints
     diagnosticSettings: diagnosticSettings
     publicNetworkAccess: empty(publicNetworkAccess) ? null : publicNetworkAccess

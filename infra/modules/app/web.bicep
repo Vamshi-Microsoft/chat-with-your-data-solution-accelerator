@@ -70,6 +70,9 @@ param publicNetworkAccess string?
 @description('Optional. Configuration details for private endpoints.')
 param privateEndpoints array = []
 
+@description('Optional. Property to configure various DNS related settings for a site.')
+param dnsConfiguration resourceInput<'Microsoft.Web/sites@2024-04-01'>.properties.dnsConfiguration?
+
 // Import AVM types - not using the imports directly but the types are compatible with the parameters
 
 // Calculate the linuxFxVersion based on runtime or docker settings
@@ -126,6 +129,7 @@ module web '../core/host/appservice.bicep' = {
     vnetImagePullEnabled: vnetImagePullEnabled
     vnetRouteAllEnabled: vnetRouteAllEnabled
     virtualNetworkSubnetId: virtualNetworkSubnetId
+    dnsConfiguration: dnsConfiguration
     publicNetworkAccess: empty(publicNetworkAccess) ? null : publicNetworkAccess
     privateEndpoints: privateEndpoints
     managedIdentities: {

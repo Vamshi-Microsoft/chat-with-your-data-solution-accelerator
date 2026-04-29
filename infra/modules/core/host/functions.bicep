@@ -134,6 +134,9 @@ param diagnosticSettings array = []
 ])
 param publicNetworkAccess string = 'Enabled'
 
+@description('Optional. Property to configure various DNS related settings for a site.')
+param dnsConfiguration resourceInput<'Microsoft.Web/sites@2024-04-01'>.properties.dnsConfiguration?
+
 var appConfigs = [
   {
     name: 'appsettings'
@@ -202,6 +205,7 @@ module functions 'appservice.bicep' = {
     vnetContentShareEnabled: vnetContentShareEnabled
     vnetImagePullEnabled: vnetImagePullEnabled
     vnetRouteAllEnabled: vnetRouteAllEnabled
+    dnsConfiguration: dnsConfiguration
     privateEndpoints: privateEndpoints
     diagnosticSettings: diagnosticSettings
     publicNetworkAccess: publicNetworkAccess
