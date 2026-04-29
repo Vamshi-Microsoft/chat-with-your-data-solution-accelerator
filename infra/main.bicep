@@ -1230,6 +1230,7 @@ module web 'modules/app/web.bicep' = {
       enablePrivateNetworking ? {
         WEBSITE_DNS_SERVER: '168.63.129.16'
         WEBSITE_DNS_ALT_SERVER: '168.63.129.16'
+        WEBSITE_VNET_ROUTE_ALL: '1'
       } : {},
       {
         AZURE_BLOB_ACCOUNT_NAME: storageAccountName
@@ -1336,6 +1337,7 @@ module adminweb 'modules/app/adminweb.bicep' = {
       enablePrivateNetworking ? {
         WEBSITE_DNS_SERVER: '168.63.129.16'
         WEBSITE_DNS_ALT_SERVER: '168.63.129.16'
+        WEBSITE_VNET_ROUTE_ALL: '1'
       } : {},
       {
         AZURE_BLOB_ACCOUNT_NAME: storageAccountName
@@ -1446,6 +1448,7 @@ module function 'modules/app/function.bicep' = {
       enablePrivateNetworking ? {
         WEBSITE_DNS_SERVER: '168.63.129.16'
         WEBSITE_DNS_ALT_SERVER: '168.63.129.16'
+        WEBSITE_VNET_ROUTE_ALL: '1'
       } : {},
       {
         AZURE_BLOB_ACCOUNT_NAME: storageAccountName
