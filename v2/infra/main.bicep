@@ -2215,27 +2215,26 @@ resource flexDeploymentRole 'Microsoft.Authorization/roleAssignments@2022-04-01'
   }
 }
 
-// Event Grid system topic on the Storage Account. The single
-// subscription (BlobCreated / BlobDeleted under /documents/ →
-// blob-events queue, which the blob_event queue trigger translates into
-// the right action: create → doc-processing ingestion envelope consumed
-// by batch_push; delete → de-index, ADR 0028) is created as the
-// SEPARATE `newEventGridSubscription` resource below, NOT embedded in
-// this module's `eventSubscriptions`. Reason: Event Grid synchronously
-// validates that the delivery identity holds Storage Queue Data Message
-// Sender when the subscription is created. An embedded subscription is
-// created inside this module, before `eventGridQueueSenderRole` (which
-// needs this module's MI principalId output) can grant that role — so
-// the validator fails every deployment. Splitting the subscription out
-// lets it `dependsOn` the role assignment, mirroring the existing-topic
-// path. A queue destination -- not an Event Grid AzureFunction trigger
-// -- keeps managed-identity delivery and deploys at provision time (the
-// queue exists; a function would not yet). The add_url path is
-// HTTP-triggered, not blob-triggered, so it needs no subscription. When
-// reusing v1's storage that already has a system topic, the AVM module
-// is skipped and a sibling `existingEventGridSubscription` resource adds
-// our subscription to the v1 topic (Azure permits only one system topic
+// Event Grid system topic on the Storage Account. Single subscription:
+// BlobCreated / BlobDeleted under /documents/ → blob-events queue, which
+// the blob_event queue trigger translates into the right action (create
+// → doc-processing ingestion envelope consumed by batch_push; delete →
+// de-index) (ADR 0028). A queue destination --
+// not an Event Grid AzureFunction trigger -- keeps managed-identity
+// delivery and deploys at provision time (the queue exists; a function
+// would not yet). The add_url path is HTTP-triggered, not
+// blob-triggered, so it needs no subscription. When reusing v1's
+// storage that already has a system topic, the AVM module is skipped
+// and a sibling `existingEventGridSubscription` resource adds our
+// subscription to the v1 topic (Azure permits only one system topic
 // per source).
+//
+// The module creates ONLY the topic + its system-assigned MI. The
+// subscription is a sibling `newEventGridSubscription` resource below so
+// it can `dependsOn` the eventGridQueueSenderRole grant: Event Grid
+// validates the delivery MI's queue-send permission synchronously at
+// subscription-creation time, and embedding the subscription inside the
+// module preflighted it before the external role grant could run.
 module eventGridSystemTopic 'br/public:avm/res/event-grid/system-topic:0.6.4' = if (!useExistingEventGridTopic) {
   name: take('avm.res.event-grid.system-topic.${solutionSuffix}', 64)
   params: {
@@ -2248,7 +2247,6 @@ module eventGridSystemTopic 'br/public:avm/res/event-grid/system-topic:0.6.4' = 
     managedIdentities: {
       systemAssigned: true
     }
-    eventSubscriptions: []
   }
 }
 
@@ -2274,22 +2272,23 @@ resource eventGridQueueSenderRole 'Microsoft.Authorization/roleAssignments@2022-
   }
 }
 
-// Reference to the system topic the AVM module creates above, so the
-// standalone subscription can attach to it as a parent. Gated on the
-// same condition as the module.
+// Standalone event subscription on the NEW system topic. Lifted out of
+// the AVM system-topic module so it can `dependsOn` eventGridQueueSenderRole:
+// Event Grid validates the delivery MI's queue-send permission
+// synchronously at subscription-creation time, but that role grant is an
+// external resource ARM orders AFTER the module. Embedded in the module,
+// the subscription preflight 401'd before the role existed, the module
+// failed, and (because the role consumes a module output) the role never
+// ran either -- a deploy-time chicken-and-egg. As a sibling that depends
+// on the role, the grant is always in place before the preflight runs.
 resource newEventGridTopic 'Microsoft.EventGrid/systemTopics@2024-12-15-preview' existing = if (!useExistingEventGridTopic) {
   name: eventGridSystemTopicName
+  dependsOn: [eventGridSystemTopic]
 }
 
-// The blob-events subscription on the newly created system topic.
-// Created AFTER `eventGridQueueSenderRole` (via dependsOn) so Event
-// Grid's synchronous MI-delivery validator sees the Storage Queue Data
-// Message Sender grant already in place — the fix for the
-// "Managed identity for event subscription does not have authorization
-// to deliver to the endpoint" failure (aka.ms/egmsivalidation).
 resource newEventGridSubscription 'Microsoft.EventGrid/systemTopics/eventSubscriptions@2024-12-15-preview' = if (!useExistingEventGridTopic) {
   parent: newEventGridTopic
-  // Name retained (not 'blob-created-to-blob-events') so the destination
+  // Name retained (not 'blob-created-to-blob-events') so a destination
   // repoint is an in-place update; renaming under azd incremental mode
   // would orphan the prior subscription, leaving it to keep delivering
   // to doc-processing.

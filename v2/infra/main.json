@@ -6,7 +6,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.44.1.10279",
-      "templateHash": "11102442063901494498"
+      "templateHash": "1793647809827106231"
     },
     "name": "Chat With Your Data v2",
     "description": "Foundry-first RAG accelerator. Single databaseType parameter selects chat history + vector index. Two orchestrators (Agent Framework, LangGraph) on a shared Foundry Project."
@@ -845,7 +845,10 @@
       "existing": true,
       "type": "Microsoft.EventGrid/systemTopics",
       "apiVersion": "2024-12-15-preview",
-      "name": "[variables('eventGridSystemTopicName')]"
+      "name": "[variables('eventGridSystemTopicName')]",
+      "dependsOn": [
+        "eventGridSystemTopic"
+      ]
     },
     "newEventGridSubscription": {
       "condition": "[not(variables('useExistingEventGridTopic'))]",
@@ -881,6 +884,7 @@
       },
       "dependsOn": [
         "eventGridQueueSenderRole",
+        "eventGridSystemTopic",
         "storageAccount"
       ]
     },
@@ -15472,9 +15476,9 @@
         }
       },
       "dependsOn": [
-        "[format('avmPrivateDnsZones[{0}]', variables('dnsZoneIndex').cognitiveServices)]",
         "[format('avmPrivateDnsZones[{0}]', variables('dnsZoneIndex').aiServicesProject)]",
         "[format('avmPrivateDnsZones[{0}]', variables('dnsZoneIndex').openAI)]",
+        "[format('avmPrivateDnsZones[{0}]', variables('dnsZoneIndex').cognitiveServices)]",
         "logAnalyticsWorkspace",
         "userAssignedIdentity",
         "virtualNetwork"
@@ -31017,9 +31021,9 @@
         }
       },
       "dependsOn": [
+        "[format('avmPrivateDnsZones[{0}]', variables('dnsZoneIndex').queue)]",
         "[format('avmPrivateDnsZones[{0}]', variables('dnsZoneIndex').blob)]",
         "[format('avmPrivateDnsZones[{0}]', variables('dnsZoneIndex').file)]",
-        "[format('avmPrivateDnsZones[{0}]', variables('dnsZoneIndex').queue)]",
         "logAnalyticsWorkspace",
         "userAssignedIdentity",
         "virtualNetwork"
@@ -76783,9 +76787,6 @@
             "value": {
               "systemAssigned": true
             }
-          },
-          "eventSubscriptions": {
-            "value": []
           }
         },
         "template": {
