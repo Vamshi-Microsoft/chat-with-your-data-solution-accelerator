@@ -2244,9 +2244,9 @@ module eventGridSystemTopic 'br/public:avm/res/event-grid/system-topic:0.6.4' = 
     enableTelemetry: false
     source: effectiveStorageResourceId
     topicType: 'Microsoft.Storage.StorageAccounts'
-    managedIdentities: {
-      systemAssigned: true
-    }
+    // managedIdentities: {
+    //   systemAssigned: true
+    // }
   }
 }
 
@@ -2255,22 +2255,19 @@ module eventGridSystemTopic 'br/public:avm/res/event-grid/system-topic:0.6.4' = 
 // reusing v1's topic (the existingEventGridSubscription below uses our
 // UAMI, which already gets Queue Data Contributor via
 // existingStorageQueueContributor above).
-resource eventGridQueueSenderRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (!useExistingEventGridTopic) {
-  name: guid(storageAccountExisting.id, eventGridSystemTopicName, storageQueueDataMessageSenderRoleId)
-  scope: storageAccountExisting
-  properties: {
-    roleDefinitionId: subscriptionResourceId(
-      'Microsoft.Authorization/roleDefinitions',
-      storageQueueDataMessageSenderRoleId
-    )
-    // managedIdentities.systemAssigned: true is set unconditionally on
-    // the topic above, so this output is always populated. The non-null
-    // assertion satisfies Bicep's nullable-output type without the
-    // empty-string fallback (which would fail the GUID min-length check).
-    principalId: eventGridSystemTopic!.outputs.systemAssignedMIPrincipalId!
-    principalType: 'ServicePrincipal'
-  }
-}
+// resource eventGridQueueSenderRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (!useExistingEventGridTopic) {
+//   name: guid(storageAccountExisting.id, eventGridSystemTopicName, storageQueueDataMessageSenderRoleId)
+//   scope: storageAccountExisting
+//   properties: {
+//     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', storageQueueDataMessageSenderRoleId)
+//     // managedIdentities.systemAssigned: true is set unconditionally on
+//     // the topic above, so this output is always populated. The non-null
+//     // assertion satisfies Bicep's nullable-output type without the
+//     // empty-string fallback (which would fail the GUID min-length check).
+//     principalId: eventGridSystemTopic!.outputs.systemAssignedMIPrincipalId!
+//     principalType: 'ServicePrincipal'
+//   }
+// }
 
 // Standalone event subscription on the NEW system topic. Lifted out of
 // the AVM system-topic module so it can `dependsOn` eventGridQueueSenderRole:
@@ -2297,16 +2294,23 @@ resource newEventGridSubscription 'Microsoft.EventGrid/systemTopics/eventSubscri
     // deliveryWithResourceIdentity (NOT plain destination) is required
     // because storage has allowSharedKeyAccess=false. The system topic's
     // system-assigned MI authenticates to Storage Queue.
-    deliveryWithResourceIdentity: {
-      identity: {
-        type: 'SystemAssigned'
-      }
-      destination: {
-        endpointType: 'StorageQueue'
-        properties: {
-          resourceId: effectiveStorageResourceId
-          queueName: blobEventsQueueName
-        }
+    // deliveryWithResourceIdentity: {
+    //   identity: {
+    //     type: 'SystemAssigned'
+    //   }
+    //   destination: {
+    //     endpointType: 'StorageQueue'
+    //     properties: {
+    //       resourceId: effectiveStorageResourceId
+    //       queueName: blobEventsQueueName
+    //     }
+    //   }
+    // }
+    destination: {
+      endpointType: 'StorageQueue'
+      properties: {
+        resourceId: effectiveStorageResourceId
+        queueName: blobEventsQueueName
       }
     }
     filter: {
@@ -2320,9 +2324,6 @@ resource newEventGridSubscription 'Microsoft.EventGrid/systemTopics/eventSubscri
       eventTimeToLiveInMinutes: 1440
     }
   }
-  dependsOn: [
-    eventGridQueueSenderRole
-  ]
 }
 
 // EXISTING Event Grid system topic reuse. Adds a new subscription on
