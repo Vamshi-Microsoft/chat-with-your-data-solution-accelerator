@@ -23,13 +23,31 @@ cd chat-with-your-data-solution-accelerator
 bash scripts/post_deployment_setup.sh "<your-resource-group-name>"
 ```
 
-### Step 2: Configure App Authentication
+### Step 2: Build and Push Container Images (Container Model Only)
+
+> **📌 Skip this step** if you deployed with the default `hostingModel=code`.
+
+When deploying with `hostingModel=container`, the App Services start with a placeholder hello-world image. Build and push the application images to your Azure Container Registry, then update the App Services.
+
+**Build and push images (remote build, no Docker required):**
+```bash
+bash scripts/build_and_push_images.sh "<your-resource-group-name>"
+```
+
+**Update App Services to use the new ACR images:**
+```bash
+bash scripts/update_app_service_images.sh "<your-resource-group-name>"
+```
+
+> The update script configures managed-identity based authentication between the App Services and your private ACR, then restarts all services.
+
+### Step 3: Configure App Authentication
 
 1. After deployment is complete, navigate to your Azure App Service in the Azure portal
 2. Follow the detailed instructions in [Set Up Authentication in Azure App Service](./azure_app_service_auth_setup.md) to add authentication to your web app
 3. This will ensure only authorized users can access your application
 
-### Step 3: Access and Configure the Admin Site
+### Step 4: Access and Configure the Admin Site
 
 1. **Navigate to the admin site** using the following URL pattern:
    ```
@@ -47,7 +65,7 @@ bash scripts/post_deployment_setup.sh "<your-resource-group-name>"
    - Wait for the documents to be processed and indexed
    - Verify successful ingestion through the admin interface
 
-### Step 4: Access the Chat Application
+### Step 5: Access the Chat Application
 
 1. **Navigate to the main chat application** using this URL pattern:
    ```

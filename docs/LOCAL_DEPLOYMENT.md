@@ -334,20 +334,59 @@ bash scripts/post_deployment_setup.sh "<your-resource-group-name>"
 
 > **Note:** The script auto-discovers all resources in the resource group. It handles private networking (WAF) deployments by temporarily enabling public access, performing the setup, then restoring the original state.
 
-### 5.2 Configure Authentication (Required for Chat Application)
+### 5.2 Build and Push Container Images (Container Model Only)
+
+> **📌 Skip this step** if you deployed with the default `hostingModel=code`.
+
+When deploying with `hostingModel=container`, the App Services start with a placeholder hello-world image. After provisioning, build and push the application images to your Azure Container Registry, then update the App Services to use them.
+
+**Step A — Build and push images to ACR**
+
+*PowerShell (Windows):*
+```powershell
+.\scripts\build_and_push_images.ps1 -ResourceGroupName "<your-resource-group-name>"
+```
+
+*Bash (Linux/macOS/WSL):*
+```bash
+bash scripts/build_and_push_images.sh "<your-resource-group-name>"
+```
+
+> By default, images are built remotely using `az acr build` (no local Docker required). To build locally with Docker and push, add `--mode local`.
+
+**Step B — Update App Services to use the new images**
+
+*PowerShell (Windows):*
+```powershell
+.\scripts\update_app_service_images.ps1 -ResourceGroupName "<your-resource-group-name>"
+```
+
+*Bash (Linux/macOS/WSL):*
+```bash
+bash scripts/update_app_service_images.sh "<your-resource-group-name>"
+```
+
+This script:
+- Discovers the ACR and managed identity in your resource group
+- Updates each App Service to pull its image from your private ACR using managed-identity authentication
+- Restarts all services
+
+> **Re-deployment note:** If you re-run `azd provision`, repeat Steps A and B to restore the correct container images.
+
+### 5.3 Configure Authentication (Required for Chat Application)
 
 **This step is mandatory for Chat Application access:**
 
 1. Follow [App Authentication Configuration](./azure_app_service_auth_setup.md)
 2. Wait up to 10 minutes for authentication changes to take effect
 
-### 5.3 Verify Deployment
+### 5.4 Verify Deployment
 
 1. Access your application using the URL from Step 4.3
 2. Confirm the application loads successfully
 3. Verify you can sign in with your authenticated account
 
-### 5.4 Test the Application
+### 5.5 Test the Application
 
 **Quick Test Steps:**
 1. Navigate to the admin site, where you can upload documents. Then select Ingest Data and add your data. You can find sample data in the [data](../data) directory.
