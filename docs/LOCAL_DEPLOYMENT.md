@@ -334,44 +334,30 @@ bash scripts/post_deployment_setup.sh "<your-resource-group-name>"
 
 > **Note:** The script auto-discovers all resources in the resource group. It handles private networking (WAF) deployments by temporarily enabling public access, performing the setup, then restoring the original state.
 
-### 5.2 Build and Push Container Images (Container Model Only)
+### 5.2 Build, Push, and Update Container Images (Container Model Only)
 
 > **📌 Skip this step** if you deployed with the default `hostingModel=code`.
 
-When deploying with `hostingModel=container`, the App Services start with a placeholder hello-world image. After provisioning, build and push the application images to your Azure Container Registry, then update the App Services to use them.
-
-**Step A — Build and push images to ACR**
+When deploying with `hostingModel=container`, the App Services start with a placeholder hello-world image. After provisioning, run the combined container workflow to build and push the application images to your Azure Container Registry and update the App Services to use them.
 
 *PowerShell (Windows):*
 ```powershell
-.\scripts\build_and_push_images.ps1 -ResourceGroupName "<your-resource-group-name>"
+.\scripts\acr_build_push_update.ps1 -ResourceGroupName "<your-resource-group-name>"
 ```
 
 *Bash (Linux/macOS/WSL):*
 ```bash
-bash scripts/build_and_push_images.sh "<your-resource-group-name>"
-```
-
-> By default, images are built remotely using `az acr build` (no local Docker required). To build locally with Docker and push, add `--mode local`.
-
-**Step B — Update App Services to use the new images**
-
-*PowerShell (Windows):*
-```powershell
-.\scripts\update_app_service_images.ps1 -ResourceGroupName "<your-resource-group-name>"
-```
-
-*Bash (Linux/macOS/WSL):*
-```bash
-bash scripts/update_app_service_images.sh "<your-resource-group-name>"
+bash scripts/acr_build_push_update.sh "<your-resource-group-name>"
 ```
 
 This script:
-- Discovers the ACR and managed identity in your resource group
+- Builds and pushes the images to your ACR
 - Updates each App Service to pull its image from your private ACR using managed-identity authentication
 - Restarts all services
 
-> **Re-deployment note:** If you re-run `azd provision`, repeat Steps A and B to restore the correct container images.
+> By default, images are built remotely using `az acr build` (no local Docker required). To build locally with Docker instead, use `-Mode local` in PowerShell or `--mode local` in Bash. You can also set a custom tag with `-Tag` or `--tag`.
+
+> **Re-deployment note:** If you re-run `azd provision`, run this script again to restore the correct container images.
 
 ### 5.3 Configure Authentication (Required for Chat Application)
 

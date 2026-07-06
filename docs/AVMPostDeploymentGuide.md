@@ -23,23 +23,18 @@ cd chat-with-your-data-solution-accelerator
 bash scripts/post_deployment_setup.sh "<your-resource-group-name>"
 ```
 
-### Step 2: Build and Push Container Images (Container Model Only)
+### Step 2: Build, Push, and Update Container Images (Container Model Only)
 
 > **📌 Skip this step** if you deployed with the default `hostingModel=code`.
 
-When deploying with `hostingModel=container`, the App Services start with a placeholder hello-world image. Build and push the application images to your Azure Container Registry, then update the App Services.
+When deploying with `hostingModel=container`, the App Services start with a placeholder hello-world image. Run the combined container workflow to build and push the application images to your Azure Container Registry and update the App Services to use them.
 
-**Build and push images (remote build, no Docker required):**
+**Run the combined ACR build/push/update script (remote build, no Docker required):**
 ```bash
-bash scripts/build_and_push_images.sh "<your-resource-group-name>"
+bash scripts/acr_build_push_update.sh "<your-resource-group-name>"
 ```
 
-**Update App Services to use the new ACR images:**
-```bash
-bash scripts/update_app_service_images.sh "<your-resource-group-name>"
-```
-
-> The update script configures managed-identity based authentication between the App Services and your private ACR, then restarts all services.
+> The script configures managed-identity based authentication between the App Services and your private ACR, then restarts all services. To build locally with Docker instead, use `--mode local`.
 
 ### Step 3: Configure App Authentication
 
