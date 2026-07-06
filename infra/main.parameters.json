@@ -103,13 +103,13 @@
       "value": "${AZURE_OPENAI_API_VERSION=2024-02-01}"
     },
     "azureOpenAIModel": {
-      "value": "${AZURE_OPENAI_MODEL=gpt-4.1}"
+      "value": "${AZURE_OPENAI_MODEL=gpt-5.1}"
     },
     "azureOpenAIModelName": {
-      "value": "${AZURE_OPENAI_MODEL_NAME=gpt-4.1}"
+      "value": "${AZURE_OPENAI_MODEL_NAME=gpt-5.1}"
     },
     "azureOpenAIModelVersion": {
-      "value": "${AZURE_OPENAI_MODEL_VERSION=2025-04-14}"
+      "value": "${AZURE_OPENAI_MODEL_VERSION=2025-11-13}"
     },
     "azureOpenAIModelCapacity": {
       "value": "${AZURE_OPENAI_MODEL_CAPACITY=150}"
@@ -173,9 +173,6 @@
     },
     "existingLogAnalyticsWorkspaceId": {
       "value": "${AZURE_ENV_LOG_ANALYTICS_WORKSPACE_ID}"
-    },
-    "appversion": {
-      "value": "${AZURE_IMAGE_TAG=latest_waf}"
     }
   }
 }

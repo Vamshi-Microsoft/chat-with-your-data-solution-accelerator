@@ -136,29 +136,22 @@ update_functionapp() {
   echo "  Updating Function App: $APP_NAME"
   echo "    Image: $FULL_IMAGE"
 
-  # 1. Set container image
-  az functionapp config container set \
-    --name "$APP_NAME" \
-    --resource-group "$RESOURCE_GROUP" \
-    --image "$FULL_IMAGE" \
-    --registry-server "https://${ACR_LOGIN_SERVER}" \
-    --output none
-
-  # 2. Set DOCKER_REGISTRY_SERVER_URL app setting
+  # 1. Set DOCKER_REGISTRY_SERVER_URL app setting
   az functionapp config appsettings set \
     --name "$APP_NAME" \
     --resource-group "$RESOURCE_GROUP" \
     --settings "DOCKER_REGISTRY_SERVER_URL=https://${ACR_LOGIN_SERVER}" \
     --output none
 
-  # 3. Enable ACR pull with user-assigned managed identity
+  # 2. Set the Linux custom container image and managed identity pull
   az resource update \
     --ids "/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Web/sites/${APP_NAME}" \
+    --set "properties.siteConfig.linuxFxVersion=DOCKER|${FULL_IMAGE}" \
     --set "properties.siteConfig.acrUseManagedIdentityCreds=true" \
     --set "properties.siteConfig.acrUserManagedIdentityID=${MI_CLIENT_ID}" \
     --output none
 
-  # 4. Restart
+  # 3. Restart
   az functionapp restart \
     --name "$APP_NAME" \
     --resource-group "$RESOURCE_GROUP"

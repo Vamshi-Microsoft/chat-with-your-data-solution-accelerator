@@ -133,13 +133,13 @@ var azureOpenAIResourceName string = 'oai-${solutionSuffix}'
 param azureOpenAISkuName string = 'S0'
 
 @description('Optional. Azure OpenAI Model Deployment Name.')
-param azureOpenAIModel string = 'gpt-4.1'
+param azureOpenAIModel string = 'gpt-5.1'
 
 @description('Optional. Azure OpenAI Model Name.')
-param azureOpenAIModelName string = 'gpt-4.1'
+param azureOpenAIModelName string = 'gpt-5.1'
 
 @description('Optional. Azure OpenAI Model Version.')
-param azureOpenAIModelVersion string = '2025-04-14'
+param azureOpenAIModelVersion string = '2025-11-13'
 
 @description('Optional. Azure OpenAI Model Capacity - See here for more info  https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/quota.')
 param azureOpenAIModelCapacity int = 150
@@ -339,9 +339,6 @@ var blobContainerName = 'documents'
 var queueName = 'doc-processing'
 var clientKey = '${uniqueString(guid(subscription().id, deployment().name))}${newGuidString}'
 var eventGridSystemTopicName = 'evgt-${solutionSuffix}'
-
-@description('Optional. Image version tag to use. Defaults to "latest" for new per-deployment ACR workflow.')
-param appversion string = 'latest'
 
 // ACR name: alphanumeric only, 5-50 chars, globally unique
 var registryName = 'cr${solutionSuffix}'
@@ -2201,6 +2198,16 @@ output CONVERSATION_FLOW string = conversationFlow
 
 @description('Whether advanced image processing is enabled.')
 output USE_ADVANCED_IMAGE_PROCESSING bool = useAdvancedImageProcessing
+
+// Outputs useful for deployment scripts (ACR, identities, and service names)
+@description('Azure Container Registry name (short name)')
+output ACR_NAME string = registryName
+
+@description('Azure Container Registry login server (e.g. <name>.azurecr.io)')
+output ACR_LOGIN_SERVER string = '${registryName}.azurecr.io'
+
+@description('User-assigned managed identity client id used by the apps')
+output MANAGED_IDENTITY_CLIENT_ID string = managedIdentityModule.outputs.clientId
 
 @description('Whether Azure Search is using integrated vectorization.')
 output AZURE_SEARCH_USE_INTEGRATED_VECTORIZATION bool = azureSearchUseIntegratedVectorization
