@@ -195,14 +195,8 @@ update_function_app() {
     echo "  Updating Function App: $app_name"
     echo "    Image: $full_image"
 
-    # Set DOCKER_REGISTRY_SERVER_URL app setting
-    az functionapp config appsettings set \
-        --name "$app_name" \
-        --resource-group "$RESOURCE_GROUP" \
-        --settings "DOCKER_REGISTRY_SERVER_URL=https://${ACR_LOGIN_SERVER}" \
-        --output none
-
-    # Set the Linux custom container image and managed identity pull
+    # Update Function App with container configuration using resource update
+    # This sets linuxFxVersion=DOCKER|<image> and enables managed identity pull
     local resource_id="/subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Web/sites/${app_name}"
     az resource update \
         --ids "$resource_id" \
@@ -211,7 +205,7 @@ update_function_app() {
         --set "properties.siteConfig.acrUserManagedIdentityID=$MI_CLIENT_ID" \
         --output none
 
-    # Restart
+    # Restart to apply changes
     az functionapp restart \
         --name "$app_name" \
         --resource-group "$RESOURCE_GROUP"
@@ -220,6 +214,12 @@ update_function_app() {
 # -------------------------------------------------------
 # Build and push images
 # -------------------------------------------------------
+IMAGE_DEFINITIONS=(
+    "docker/Frontend.Dockerfile:rag-webapp"
+    "docker/Admin.Dockerfile:rag-adminwebapp"
+    "docker/Backend.Dockerfile:rag-backend"
+)
+
 echo ""
 if [[ "$BUILD_MODE" == "local" ]]; then
     echo "--- LOCAL BUILD (Docker daemon) ---"
@@ -238,7 +238,7 @@ if [[ "$BUILD_MODE" == "local" ]]; then
     echo "Logging in to ACR '$ACR_NAME'..."
     az acr login --name "$ACR_NAME"
 
-    for dockerfile in "docker/Frontend.Dockerfile:rag-webapp" "docker/Admin.Dockerfile:rag-adminwebapp" "docker/Backend.Dockerfile:rag-backend"; do
+    for dockerfile in "${IMAGE_DEFINITIONS[@]}"; do
         dockerfile_path="${dockerfile%%:*}"
         image_name="${dockerfile##*:}"
         full_tag="${ACR_LOGIN_SERVER}/${image_name}:${IMAGE_TAG}"
@@ -257,7 +257,7 @@ else
     echo "    Note: your Azure identity needs Contributor or AcrPush access on the ACR."
     echo ""
 
-    for dockerfile in "docker/Frontend.Dockerfile:rag-webapp" "docker/Admin.Dockerfile:rag-adminwebapp" "docker/Backend.Dockerfile:rag-backend"; do
+    for dockerfile in "${IMAGE_DEFINITIONS[@]}"; do
         dockerfile_path="${dockerfile%%:*}"
         image_name="${dockerfile##*:}"
         full_tag="${image_name}:${IMAGE_TAG}"

@@ -73,6 +73,12 @@ if (Test-Path $azureDir) {
     }
 }
 
+$Images = @(
+    [pscustomobject]@{ Name = 'rag-webapp'; Dockerfile = 'docker/Frontend.Dockerfile' },
+    [pscustomobject]@{ Name = 'rag-adminwebapp'; Dockerfile = 'docker/Admin.Dockerfile' },
+    [pscustomobject]@{ Name = 'rag-backend'; Dockerfile = 'docker/Backend.Dockerfile' }
+)
+
 Write-Host "=============================================="
 Write-Host " Build, Push & Update Images"
 Write-Host " Resource Group : $ResourceGroupName"
@@ -277,15 +283,10 @@ function Update-FunctionApp {
     Write-Host "  Updating Function App: $AppName"
     Write-Host "    Image: $FullImage"
 
-    # 1. Set DOCKER_REGISTRY_SERVER_URL app setting
-    az functionapp config appsettings set `
-        --name $AppName `
-        --resource-group $ResourceGroupName `
-        --settings "DOCKER_REGISTRY_SERVER_URL=https://${AcrLoginServer}" `
-        --output none
-
-    # 2. Set the Linux custom container image and managed identity pull
+    # Update Function App with container configuration using resource update
+    # This sets linuxFxVersion=DOCKER|<image> and enables managed identity pull
     $ResourceId = "/subscriptions/${SubscriptionId}/resourceGroups/${ResourceGroupName}/providers/Microsoft.Web/sites/${AppName}"
+
     az resource update `
         --ids $ResourceId `
         --set "properties.siteConfig.linuxFxVersion=DOCKER|${FullImage}" `
@@ -293,7 +294,7 @@ function Update-FunctionApp {
         --set "properties.siteConfig.acrUserManagedIdentityID=$MiClientId" `
         --output none
 
-    # 3. Restart
+    # Restart to apply changes
     az functionapp restart `
         --name $AppName `
         --resource-group $ResourceGroupName

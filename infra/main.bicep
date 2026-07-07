@@ -2232,9 +2232,3 @@ output OPEN_AI_FUNCTIONS_SYSTEM_PROMPT string = openAIFunctionsSystemPrompt
 
 @description('System prompt used by the Semantic Kernel orchestration.')
 output SEMANTIC_KERNEL_SYSTEM_PROMPT string = semanticKernelSystemPrompt
-
-@description('Name of the Azure Container Registry provisioned for this deployment.')
-output AZURE_CONTAINER_REGISTRY_NAME string = registryName
-
-@description('Login server URL of the Azure Container Registry.')
-output AZURE_CONTAINER_REGISTRY_ENDPOINT string = containerRegistry.outputs.loginServer

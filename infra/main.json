@@ -6,7 +6,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.44.1.10279",
-      "templateHash": "17691213829505854879"
+      "templateHash": "5512415676000078647"
     }
   },
   "parameters": {
@@ -59002,9 +59002,9 @@
         }
       },
       "dependsOn": [
+        "[format('avmPrivateDnsZones[{0}]', variables('dnsZoneIndex').storageQueue)]",
         "[format('avmPrivateDnsZones[{0}]', variables('dnsZoneIndex').storageFile)]",
         "[format('avmPrivateDnsZones[{0}]', variables('dnsZoneIndex').storageBlob)]",
-        "[format('avmPrivateDnsZones[{0}]', variables('dnsZoneIndex').storageQueue)]",
         "managedIdentityModule",
         "virtualNetwork"
       ]
@@ -61054,20 +61054,6 @@
         "description": "System prompt used by the Semantic Kernel orchestration."
       },
       "value": "[variables('semanticKernelSystemPrompt')]"
-    },
-    "AZURE_CONTAINER_REGISTRY_NAME": {
-      "type": "string",
-      "metadata": {
-        "description": "Name of the Azure Container Registry provisioned for this deployment."
-      },
-      "value": "[variables('registryName')]"
-    },
-    "AZURE_CONTAINER_REGISTRY_ENDPOINT": {
-      "type": "string",
-      "metadata": {
-        "description": "Login server URL of the Azure Container Registry."
-      },
-      "value": "[reference('containerRegistry').outputs.loginServer.value]"
     }
   }
 }
