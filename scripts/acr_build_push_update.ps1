@@ -283,13 +283,22 @@ function Update-FunctionApp {
     Write-Host "  Updating Function App: $AppName"
     Write-Host "    Image: $FullImage"
 
-    # Update Function App with container configuration using resource update
-    # This sets linuxFxVersion=DOCKER|<image> and enables managed identity pull
+    # Set the container image via the dedicated command. This lets az build the
+    # "DOCKER|<image>" linuxFxVersion internally, avoiding passing a literal '|'
+    # on the command line (cmd.exe would otherwise interpret it as a pipe and
+    # fail with "'<registry>.azurecr.io' is not recognized ...").
+    az functionapp config container set `
+        --name $AppName `
+        --resource-group $ResourceGroupName `
+        --image $FullImage `
+        --registry-server "https://${AcrLoginServer}" `
+        --output none
+
+    # Enable managed identity based ACR pull (no pipe characters here)
     $ResourceId = "/subscriptions/${SubscriptionId}/resourceGroups/${ResourceGroupName}/providers/Microsoft.Web/sites/${AppName}"
 
     az resource update `
         --ids $ResourceId `
-        --set "properties.siteConfig.linuxFxVersion=DOCKER|${FullImage}" `
         --set "properties.siteConfig.acrUseManagedIdentityCreds=true" `
         --set "properties.siteConfig.acrUserManagedIdentityID=$MiClientId" `
         --output none
